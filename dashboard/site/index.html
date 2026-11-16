@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<!-- Live version as of 2026-11-16, sanitised by scripts/sync.py; app, repo and machine values come from ~/.claude/lead/config.json. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>studio roadmap</title>
+<style>
+  /* Layout: one column read top to bottom on a phone: what needs J, what changed, what is moving,
+     what is left before the license, then the per-app tiles, charts and the card browser. */
+  :root {
+    color-scheme: light;
+    --bg: #f7f7f5; --panel: #ffffff; --line: #e4e3de; --ink: #141413; --ink-2: #55544f; --ink-3: #6f6e68;
+    --accent: #0f7b6c; --flag: #a84a06; --flag-bg: #fdf0e3; --ok: #1a7f37; --track: #ecebe6;
+    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --s7: #6250d6;
+    --rel: #1c5cab; --done: #6da7ec; --active: #eb6834; --todo: #d3d2cc;
+    --on-accent: #ffffff;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #141413; --panel: #1e1e1c; --line: #33332f; --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #9a998f;
+      --accent: #3cc7b0; --flag: #f0a35e; --flag-bg: #3a2a1a; --ok: #4ac26b; --track: #2c2c29;
+      --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9;
+      --rel: #3987e5; --done: #1c5cab; --active: #d95926; --todo: #45453f;
+      --on-accent: #0b1f1c;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #141413; --panel: #1e1e1c; --line: #33332f; --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #9a998f;
+    --accent: #3cc7b0; --flag: #f0a35e; --flag-bg: #3a2a1a; --ok: #4ac26b; --track: #2c2c29;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9;
+    --rel: #3987e5; --done: #1c5cab; --active: #d95926; --todo: #45453f;
+    --on-accent: #0b1f1c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); }
+  body { font: 15px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+         -webkit-text-size-adjust: 100%; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 18px 16px 60px; }
+  h1 { font: 700 26px/1.15 -apple-system, "SF Pro Display", system-ui, sans-serif; margin: 0; letter-spacing: -0.01em; }
+  h2 { font-size: 17px; margin: 0; letter-spacing: -0.005em; }
+  h3 { font-size: 15px; margin: 0; }
+  .sub { color: var(--ink-2); margin: 4px 0 0; font-size: 13.5px; }
+  .note { color: var(--ink-3); font-size: 12.5px; margin: 2px 0 10px; }
+  .num { font-variant-numeric: tabular-nums; }
+  a { color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .banner { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line);
+            font-size: 13.5px; color: var(--ink-2); }
+  .banner[hidden] { display: none; }
+
+  /* section heads */
+  .head { display: flex; align-items: baseline; gap: 8px; margin: 28px 0 8px; }
+  .head .count { color: var(--ink-3); font-size: 13.5px; font-variant-numeric: tabular-nums; }
+  .head .link { margin-left: auto; }
+  .link { font: inherit; font-size: 13.5px; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 4px 0; cursor: pointer; }
+
+  /* needs you: each question in full, answerable in place */
+  .asks { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .ask { background: var(--panel); border: 1px solid color-mix(in srgb, var(--flag) 40%, var(--line)); border-radius: var(--radius); padding: 12px 14px; }
+  .ask.answered { border-color: var(--line); }
+  .ask-top { display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: var(--ink-3); }
+  .ask-top .id { font: 600 12px/1.3 ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink-2); white-space: nowrap; }
+  .ask-top .link { margin-left: auto; font-size: 12.5px; padding: 0; white-space: nowrap; }
+  .ask h3 { margin: 3px 0 0; font-size: 15.5px; line-height: 1.3; }
+  .ask .q { margin: 6px 0 0; color: var(--ink); font-size: 14.5px; line-height: 1.5; overflow-wrap: anywhere; }
+  .ask .yours { margin: 8px 0 0; padding: 8px 10px; border-radius: 10px; background: var(--bg); font-size: 13.5px; color: var(--ink-2); overflow-wrap: anywhere; }
+  .ask .yours b { color: var(--ink); font-weight: 600; }
+  .ask .went { margin: 8px 0 0; font-size: 14px; color: var(--ink); overflow-wrap: anywhere; }
+  .ask .went b { color: var(--accent); font-weight: 600; }
+  .ask .accept { display: flex; align-items: center; gap: 10px; margin: 10px 0 0; flex-wrap: wrap; }
+  .ask .accept .note { color: var(--ink-3); font-size: 13px; }
+  .answer { display: flex; gap: 8px; align-items: flex-end; margin-top: 10px; }
+  .answer textarea { flex: 1; min-width: 0; min-height: 40px; height: 40px; max-height: 180px; resize: none;
+    font: inherit; font-size: 16px; line-height: 1.35; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+  .ask .status-line { margin-top: 4px; }
+  .ask .status-line:empty { display: none; }
+  .calm { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; color: var(--ink-2); font-size: 14px; }
+  .fold { margin-top: 10px; }
+  .fold[hidden] { display: none; }
+
+  /* tiles */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 158px), 1fr)); gap: 10px; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 13px 14px 11px;
+          display: flex; flex-direction: column; min-width: 0; }
+  .tile.hero { grid-column: span 2; border-color: color-mix(in srgb, var(--app) 45%, var(--line)); }
+  @media (max-width: 420px) { .tile.hero { grid-column: 1 / -1; } }
+  .tile header { display: flex; align-items: center; gap: 8px; }
+  .tile .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--app); flex: none; }
+  .tile h3 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .badge { margin-left: auto; font-size: 11px; font-weight: 600; letter-spacing: .02em; padding: 2px 7px; border-radius: 99px;
+           border: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
+  .badge.live { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
+  .phase { color: var(--ink-2); font-size: 12.5px; margin: 2px 0 0; }
+  .big { display: flex; align-items: baseline; gap: 8px; margin: 6px 0 6px; }
+  .big .pct { font: 700 28px/1 -apple-system, "SF Pro Rounded", "SF Pro Display", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+  .tile.hero .big .pct { font-size: 38px; }
+  .tile:not(.hero) .lines { font-size: 12.5px; }
+  .tile:not(.hero) .big { flex-wrap: wrap; gap: 2px 8px; }
+  .big .frac { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .bar { height: 8px; border-radius: 99px; background: var(--track); overflow: hidden; display: flex; gap: 2px; }
+  .bar i { display: block; height: 100%; background: var(--app); border-radius: 99px; }
+  .lines { list-style: none; margin: 9px 0 0; padding: 0; font-size: 13px; color: var(--ink-2); line-height: 1.55; }
+  .lines .muted { color: var(--ink-3); }
+  .lines .flag { color: var(--flag); font-weight: 600; }
+  .from { margin: auto 0 0; padding-top: 8px; font-size: 11.5px; color: var(--ink-3); }
+
+  /* lists */
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .rows { list-style: none; margin: 0; padding: 0; }
+  .rows li { border-top: 1px solid var(--line); }
+  .rows li:first-child { border-top: 0; }
+  .row { display: grid; grid-template-columns: auto 1fr auto; gap: 2px 10px; align-items: baseline; padding: 10px 12px;
+         width: 100%; text-align: left; background: none; border: 0; color: inherit; font: inherit; cursor: pointer; }
+  .row:hover { background: color-mix(in srgb, var(--ink) 4%, transparent); }
+  .row .id { font: 600 12px/1.3 ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink-2); white-space: nowrap; min-width: 66px; }
+  .row .t { min-width: 0; overflow-wrap: anywhere; }
+  .row .meta { grid-column: 2 / 4; font-size: 12px; color: var(--ink-3); }
+  .row .said { grid-column: 2 / 4; font-size: 12.5px; color: var(--ink-2); overflow-wrap: anywhere;
+               display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  .row .side { font-size: 12.5px; white-space: nowrap; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .row .side a { font-weight: 600; text-decoration: none; padding: 4px 0 4px 8px; }
+  .pill { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 99px; background: var(--flag-bg); color: var(--flag); font-weight: 600; white-space: nowrap; }
+  .appdot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
+  .row.more { display: block; color: var(--accent); font-weight: 600; font-size: 13.5px; }
+  .empty { padding: 12px; color: var(--ink-3); font-size: 13.5px; }
+  .group { display: flex; align-items: baseline; gap: 6px; padding: 9px 12px 0; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+  .group .n { color: var(--ink-3); font-weight: 400; font-variant-numeric: tabular-nums; }
+  .rows li.g + li { border-top: 0; }
+
+  /* left before the license */
+  .app-row { display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; align-items: baseline; padding: 11px 12px 6px; }
+  .app-row .name { font-weight: 600; }
+  .app-row .left { font-variant-numeric: tabular-nums; color: var(--ink-2); font-size: 13px; }
+  .app-row .left b { color: var(--ink); font-size: 15px; }
+  .app-row .bar { grid-column: 1 / -1; height: 6px; }
+  .rows li.sub { border-top: 0; }
+  .rows li.sub .row { padding-top: 5px; padding-bottom: 5px; }
+  .rows li.sub.last .row { padding-bottom: 11px; }
+  .complete { padding: 10px 12px; font-size: 13px; color: var(--ink-2); }
+
+  /* charts */
+  .chart { position: relative; padding: 12px 12px 8px; }
+  .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .chart text { fill: var(--ink-3); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 0 12px 12px; font-size: 12px; color: var(--ink-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+         box-shadow: 0 6px 20px rgba(0,0,0,.14); padding: 6px 9px; font-size: 12px; min-width: 120px; z-index: 2; }
+  .tip b { display: block; color: var(--ink-2); font-weight: 600; margin-bottom: 2px; }
+  .tip div { display: flex; gap: 6px; align-items: center; }
+  .tip div i { width: 8px; height: 8px; border-radius: 2px; }
+  .tip div span:last-child { margin-left: auto; padding-left: 10px; font-variant-numeric: tabular-nums; }
+
+  /* card browser */
+  .tools { display: flex; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .tools input, .tools select, .sheet select, .sheet input[type=text], .sheet textarea {
+    font: inherit; font-size: 16px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 9px; padding: 7px 10px; }
+  .tools input { flex: 1 1 180px; min-width: 0; }
+  .scroll { max-height: 560px; overflow: auto; }
+
+  details.defs { margin-top: 26px; font-size: 13.5px; color: var(--ink-2); }
+  details.defs summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+  details.defs li { margin: 4px 0; }
+
+  /* detail sheet */
+  .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 10; display: flex; justify-content: center; align-items: flex-end; }
+  .scrim[hidden] { display: none; }
+  .sheet { background: var(--panel); width: 100%; max-width: 720px; max-height: 92vh; overflow: auto; border-radius: 18px 18px 0 0;
+           padding: 16px 16px 40px; box-shadow: 0 -10px 40px rgba(0,0,0,.2); }
+  @media (min-width: 760px) { .scrim { align-items: center; } .sheet { border-radius: 18px; max-height: 88vh; } }
+  .sheet .top { display: flex; align-items: flex-start; gap: 10px; }
+  .sheet .top h3 { font-size: 18px; line-height: 1.25; flex: 1; }
+  .close { border: 0; background: var(--track); color: var(--ink); border-radius: 99px; width: 32px; height: 32px; font-size: 18px; cursor: pointer; flex: none; }
+  .facts { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--ink-2); margin: 6px 0 12px; }
+  .edit { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center; padding: 12px; border-radius: 12px; background: var(--bg); margin-bottom: 12px; }
+  .edit label { font-size: 13px; color: var(--ink-2); }
+  .edit .full { grid-column: 1 / -1; }
+  .edit textarea { width: 100%; min-height: 70px; resize: vertical; }
+  .btn { font: inherit; font-weight: 600; font-size: 14px; border: 0; border-radius: 10px; padding: 9px 14px; min-height: 40px;
+         background: var(--accent); color: var(--on-accent); cursor: pointer; white-space: nowrap; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .status-line { font-size: 12.5px; color: var(--ink-3); min-height: 1.2em; }
+  .md { font-size: 14.5px; line-height: 1.55; overflow-wrap: anywhere; }
+  .md > h1:first-child { display: none; }
+  .md h1, .md h2, .md h3 { font-size: 15px; margin: 18px 0 6px; }
+  .md pre { background: var(--bg); padding: 10px; border-radius: 8px; overflow: auto; font-size: 12.5px; }
+  .md code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .9em; }
+  .md li { margin: 2px 0; }
+  .md li:has(> input[type=checkbox]) { list-style: none; margin-left: -1.2em; }
+  .md input[type=checkbox] { width: 17px; height: 17px; vertical-align: -3px; margin-right: 6px; accent-color: var(--accent); }
+  .md img { max-width: 100%; }
+  .md table { border-collapse: collapse; font-size: 13px; } .md td, .md th { border: 1px solid var(--line); padding: 3px 6px; }
+  .hist { list-style: none; padding: 0; margin: 6px 0 0; font-size: 13px; }
+  .hist li { padding: 6px 0; border-top: 1px solid var(--line); color: var(--ink-2); }
+  .hist li b { color: var(--ink); }
+  .hist time { color: var(--ink-3); font-size: 12px; margin-right: 6px; font-variant-numeric: tabular-nums; }
+  .comments li b { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Roadmap</h1>
+  <p class="sub" id="takeaway">Loading the cards…</p>
+  <div class="banner" id="gaps" role="status" hidden></div>
+  <div class="banner" id="banner" hidden></div>
+
+  <section id="needs">
+    <div class="head"><h2>Needs you</h2><span class="count" id="needs-count"></span></div>
+    <ul class="asks" id="asks"></ul>
+    <div class="card fold" id="needs-fold" hidden><ul class="rows" id="needs-list"></ul></div>
+  </section>
+
+  <section id="decided" hidden>
+    <div class="head"><h2>Decided for you</h2><span class="count" id="decided-count"></span></div>
+    <p class="note" style="margin:0 0 8px">Small choices you didn't get to within about 15 minutes. I went with my recommendation. Tap Looks good to clear one, or reply to change it.</p>
+    <ul class="asks" id="decided-list"></ul>
+  </section>
+
+  <section id="apps">
+    <div class="head"><h2>Apps</h2></div>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <section id="since">
+    <div class="head"><h2 id="since-title">Since the last check-in</h2><span class="count" id="since-count"></span>
+      <button class="link" id="since-toggle" type="button"></button></div>
+    <div class="card"><ul class="rows" id="since-list"></ul></div>
+  </section>
+
+  <section id="flight">
+    <div class="head"><h2>In flight</h2><span class="count" id="flight-count"></span></div>
+    <div class="card"><ul class="rows" id="flight-list"></ul></div>
+  </section>
+
+  <section id="left">
+    <div class="head"><h2>Left before the license</h2><span class="count" id="left-count"></span></div>
+    <div class="card"><ul class="rows" id="left-list"></ul></div>
+  </section>
+
+  <section id="built">
+    <div class="head"><h2>Cards built per day</h2></div>
+    <div class="card"><div class="chart" id="built-chart"></div><div class="legend" id="built-legend"></div></div>
+  </section>
+
+  <section id="mix">
+    <div class="head"><h2>Where each app's 1.0 cards stand</h2></div>
+    <div class="card"><div class="chart" id="mix-chart"></div><div class="legend" id="mix-legend"></div></div>
+  </section>
+
+  <section id="live-cards">
+    <div class="head"><h2>All cards</h2></div>
+    <div class="card">
+      <div class="tools">
+        <select id="live-app" aria-label="App"></select>
+        <input id="fld-q" type="search" placeholder="Search cards" aria-label="Search cards">
+        <select id="fld-status" aria-label="Status"><option value="">Open cards</option><option value="*">All cards</option></select>
+      </div>
+      <div class="scroll"><ul class="rows" id="fld-list"></ul></div>
+    </div>
+  </section>
+
+  <details class="defs" id="defs">
+    <summary>How this page counts, and where it reads from</summary>
+    <ul>
+      <li id="sources"></li>
+      <li>Needs you: cards with needs_j true that aren't built. The ones in stages 0 and 1 are shown in full with the question from the top of the card's notes; an answer you send is saved on the card as a note. Cards in the license stages and After 1.0 are folded under them.</li>
+      <li>The count in the top line is the stage 0 and 1 cards you haven't answered yet. It is a different number from a tile's "need you this phase", which counts needs_j cards in that app's current phase, answered or not, license stages included.</li>
+      <li>Since you last looked: cards whose history has an entry after the last time this device had the page open (kept in this browser only; a reload within 30 minutes is the same visit). When that is unknown, or newer than the lead's last report to you (meta/lead_checkin), the window starts at that report instead. Each card is listed once under the last move it made. Released is its own group, since those cards were listed as built when they merged. For the apps still in the vault, only cards built in the window.</li>
+      <li>In flight: cards In progress or In review, most recently changed first. "Quiet" marks a card with no change for a day while In review, or three days while In progress. Cards that need you, cards in the license stages and vault cards are never marked quiet; a vault card's state is as of the last sync.</li>
+      <li>Left before the license: stage 0 and 1 cards that aren't built, per app, the ones being worked on first, then by priority. It counts stages 0 and 1 together, while a tile in a stage 0 or 1 phase counts that phase only.</li>
+      <li>Built: status Done (merged into dev) or Released (in main through a dev to main release). The percent tracks the build, not the shipping.</li>
+      <li>Phase: the lowest stage that still has unfinished cards (After 1.0 last).</li>
+      <li>The tile's big number is the one in each app's block of the vault's Dashboard (_scripts/app-progress): while the phase is stage 0 or 1, built cards over all cards in that phase; once only license stages are left, "Before the license": built cards over every stage 0 and 1 card. The tile then also lists the licensed phase's own x/y (the number the Dashboard's top summary tiles show).</li>
+      <li>Wait on the license: unfinished cards in stages 2 and 3 (they need the paid developer program), every phase.</li>
+      <li>In review, in progress: cards with that status, every stage.</li>
+      <li>Need release: Done cards that have a PR, waiting on the next dev to main release.</li>
+      <li>Needs you this phase: needs_j true, not built, in the current phase. Only a YAML true counts, as in Obsidian.</li>
+      <li>Cards built per day: the day a card first moved to Done or Released, from the card's history in the database or the vault's git history. Cards migrated from Notion already built are left out.</li>
+      <li>Where each app's 1.0 cards stand: every card in stages 0 to 3 (After 1.0 left out), by status.</li>
+      <li>These are the rules of the vault's Dashboard note (_scripts/summary and _scripts/app-progress), so the mirrored apps match Obsidian at the commit named on their tile. The mirror is only as fresh as its last sync.</li>
+    </ul>
+  </details>
+</div>
+
+<div class="scrim" id="scrim" hidden>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="d-title"></div>
+</div>
+
+<script src="logic.js"></script>
+<script src="mirror.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

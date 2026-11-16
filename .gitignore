@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.DS_Store
+# The private config never lives in the repo; these names are ignored in case a copy lands here.
+config.json
+machine.env
+sync.private.json
+*.private.json
+dashboard/out/

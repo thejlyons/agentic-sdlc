@@ -1,0 +1,57 @@
+{
+  "_comment": "EXAMPLE values for a made-up studio. Copy to ~/.claude/lead/config.json (bootstrap does this after its interview) and replace every value. The real file is private and never belongs in this repo.",
+  "version": 1,
+  "owner": { "name": "J", "github": "OWNER", "reads_on": "phone", "check_in_hours": 4 },
+  "lead": { "workspace": "~/Github/lead-workspace", "dir": "~/.claude/lead", "session_name": "lead" },
+  "goal": "pre-license complete: every stage 0 and 1 card built in every app; stages 2, 3 and After 1.0 wait",
+  "apps": [
+    {
+      "name": "FieldApp", "prefix": "FLD", "description": "a field-data collection app",
+      "platforms": ["iOS", "iPadOS", "macOS"],
+      "repo": "OWNER/fieldapp", "path": "~/Github/FieldApp",
+      "base_branch": "dev", "release_branch": "main",
+      "roadmap": "dashboard", "collection": "fld",
+      "lane_priority": 1, "needs_simulator": true,
+      "ci": { "fast_tier_boots_simulator": true, "nightly_window_local": "00:50-03:40" }
+    },
+    {
+      "name": "StudyApp", "prefix": "STU", "description": "a study app with a shared core and a web client",
+      "platforms": ["iOS", "web"],
+      "repo": "OWNER/studyapp", "path": "~/Github/studyapp",
+      "base_branch": "dev", "release_branch": "main",
+      "roadmap": "dashboard", "collection": "stu",
+      "lane_priority": 2, "needs_simulator": true,
+      "ci": { "fast_tier_boots_simulator": true, "nightly_window_local": "06:00-07:00" }
+    }
+  ],
+  "roadmap": {
+    "dashboard": { "artifact_slug": "", "url": "" },
+    "vault": { "path": "~/Github/roadmap-vault", "repo": "OWNER/roadmap-vault" }
+  },
+  "machine": {
+    "name": "Mac mini", "ram_gb": 16, "cores": 10, "shared_with_ci_runners": true,
+    "gate": { "max_load": 30, "max_swap_mb": 12288 },
+    "stop": { "swap_mb": 13312, "load": 30, "min_free_pct": 15, "grace_s": 300 },
+    "disk_floor_gb": 21,
+    "max_sim_free_workers": 2
+  },
+  "guardrails": {
+    "vault_repo": "roadmap-vault",
+    "protected_paths": ["~/Protected"],
+    "always_ask": [
+      "direct push to an app repo's main",
+      "anything in App Store Connect",
+      "anything legal, tax, banking, purchases or domains",
+      "deleting vault content or an artifact",
+      "sending email or posting publicly"
+    ],
+    "auto_decide_minutes": 15
+  },
+  "models": {
+    "lead": "fable",
+    "implementer": "sonnet", "advisor": "fable",
+    "implementer_ui": "fable",
+    "reviewer": "fable", "reviewer_when_implementer_is_fable": "opus",
+    "scout": "haiku"
+  }
+}

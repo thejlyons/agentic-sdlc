@@ -1,0 +1,21 @@
+{
+  "_comment": "SHAPE ONLY. The real file lives outside the repo (default ~/.claude/lead/sdlc-showcase/sync.private.json) because it names what it removes. Every value here is made up.",
+  "sources": [
+    {"src": "~/.claude/skills/lead-loop/SKILL.md", "dest": "skills/lead-loop/SKILL.md"},
+    {"src": "~/somewhere/macgate.sh", "dest": "scripts/macgate.sh", "style": "code"},
+    {"src": "~/somewhere/Retro.md", "dest": "RETRO.md", "kind": "retro", "style": "doc"}
+  ],
+  "patches": {
+    "scripts/macgate.sh": [["for r in realowner/realapp; do", "for r in $GATE_REPOS; do"]]
+  },
+  "replace": [
+    ["RealAppName", "FieldApp"],
+    ["(?<![A-Za-z])RAN(?![A-Za-z])", "FLD"],
+    ["<home>/realname", "~"]
+  ],
+  "forbidden_private": [
+    {"name": "real app or project name", "regex": "(?i)realappname|realowner"}
+  ],
+  "allow_private": [],
+  "collectors": [["python3", "~/somewhere/collect.py", "{root}"]]
+}

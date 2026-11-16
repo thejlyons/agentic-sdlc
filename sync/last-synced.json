@@ -1,0 +1,28 @@
+{
+  "last_synced": "2026-11-16",
+  "files": [
+    "RETRO.md",
+    "agents/card-implementer.md",
+    "agents/card-reviewer.md",
+    "dashboard/ROADMAP-DB.md",
+    "dashboard/roadmap_card.py",
+    "dashboard/site/app.js",
+    "dashboard/site/index.html",
+    "dashboard/site/logic.js",
+    "dashboard/sync_vault.py",
+    "dashboard/tests/logic.test.js",
+    "examples/FLD-328/brief.md",
+    "examples/FLD-328/handback.md",
+    "examples/FLD-328/review-request.md",
+    "examples/FLD-328/review.md",
+    "examples/lane-rules.md",
+    "hooks/attention.py",
+    "hooks/guard.py",
+    "scripts/macgate.sh",
+    "scripts/macstop.sh",
+    "scripts/waitci.sh",
+    "scripts/waitgate.sh",
+    "skills/back-to-work/SKILL.md",
+    "skills/lead-loop/SKILL.md"
+  ]
+}

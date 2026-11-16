@@ -1,0 +1,21 @@
+{
+  "_comment": "Patterns that must never appear in this repo. scripts/scan.py fails on any hit that is not allowed below. A private file (see sync/private.example.json) adds the real app and project names; CI runs only these generic patterns.",
+  "forbidden": [
+    {"name": "email address", "regex": "[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,}"},
+    {"name": "absolute home path", "regex": "/Users/|/home/[a-z]"},
+    {"name": "legal entity", "regex": "\\bLLC\\b|\\bD-U-N-S\\b"},
+    {"name": "artifact link", "regex": "claude\\.ai/artifact"},
+    {"name": "owner account", "regex": "(?i)jlyons"},
+    {"name": "uuid (artifact slug, simulator UDID)", "regex": "\\b[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\\b"},
+    {"name": "device UDID", "regex": "\\b[0-9A-Fa-f]{8}-[0-9A-Fa-f]{16}\\b|\\b[0-9a-f]{40}\\b"},
+    {"name": "IPv4 address", "regex": "\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b"},
+    {"name": "token or key", "regex": "ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-ant-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY"},
+    {"name": "private host", "regex": "\\b[\\w-]+\\.(?:local|lan|internal|ts\\.net)\\b"}
+  ],
+  "allow": [
+    {"path": "hooks/guard.py", "regex": "/Users/\\[\\^/\\\\s\\]\\+|/Users/someone/", "reason": "the guard's own pattern for any user's home, and its self-test case with a made-up user"},
+    {"path": "sync/forbidden.json", "regex": ".", "reason": "this file defines the patterns"},
+    {"path": "scripts/scan.py", "regex": ".", "reason": "the scanner's documentation names what it looks for"},
+    {"path": "LICENSE", "regex": "^Copyright \\(c\\) 2026 thejlyons$", "reason": "the copyright holder is the public GitHub account that hosts this repo"}
+  ]
+}

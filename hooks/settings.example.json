@@ -1,0 +1,83 @@
+{
+  "_comment": "What bootstrap/install.py merges into ~/.claude/settings.json: the two hooks, the read-only allow rules and one ask rule. It never replaces the file: it adds missing entries, shows the diff and keeps a backup. A leading ~/ in a permission rule is written as the real home path at install time. Keys that start with _ are documentation and are not merged.",
+  "permissions": {
+    "allow": [
+      "mcp__claude-artifacts__get_artifact",
+      "mcp__claude-artifacts__db_get",
+      "mcp__claude-artifacts__db_list",
+      "mcp__claude-artifacts__db_query",
+      "mcp__claude-artifacts__db_write",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git status *)",
+      "Bash(git rev-parse *)",
+      "Bash(git worktree list *)",
+      "Bash(git -C * diff *)",
+      "Bash(git -C * log *)",
+      "Bash(git -C * show *)",
+      "Bash(git -C * status *)",
+      "Bash(git -C * rev-parse *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr list *)",
+      "Bash(gh run list *)",
+      "Bash(gh run view *)",
+      "Bash(grep *)",
+      "Bash(sed -n *)",
+      "Bash(wc *)",
+      "Bash(cut *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(sort *)",
+      "Bash(uniq *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(~/.claude/lead/bin/macgate.sh)",
+      "Bash(~/.claude/lead/bin/macstop.sh)",
+      "Bash(python3 ~/.claude/lead/dashboard/roadmap_card.py *)",
+      "Bash(python3 ~/.claude/lead/dashboard/sync_vault.py)"
+    ],
+    "ask": [
+      "mcp__claude-artifacts__delete_artifact"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "python3 \"$HOME/.claude/hooks/guard.py\"", "timeout": 30 }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          { "type": "command", "command": "python3 \"$HOME/.claude/hooks/attention.py\"", "timeout": 10 }
+        ]
+      }
+    ]
+  },
+  "_why_these_allow_rules": "The read-only reviewer and the lead's status checks use one simple read-only command per call. With these rules they never raise a permission prompt, so the owner is not pinged for a `git diff` (retro, 2026-11-12). Nothing here pushes or merges; the one remote write is db_write, the lead's card-status write to the dashboard database.",
+  "_optional_autoMode_example": {
+    "_comment": "NOT merged by the installer. Auto mode's prose rules are read only from the user-level settings, and a session cannot edit its own auto-mode rules: the owner adds them by hand. The wording below is generic; write your own from guardrails.always_ask in your config.",
+    "allow": [
+      "$defaults",
+      "Opening a pull request into the dev branch of an app repo is routine: every roadmap card ends in one. Merging is separate and stays behind the guard hook."
+    ],
+    "soft_deny": [
+      "$defaults",
+      "App store accounts, beta distribution, notarization, certificates or provisioning need the owner's explicit request.",
+      "Anything legal, tax, banking, payments, purchases, subscriptions or domains needs the owner's explicit request; never spend money or accept terms.",
+      "Sending email or any message to a person other than the owner, or posting publicly, needs the owner's explicit request.",
+      "Deleting or moving roadmap card files in the roadmap vault needs the owner's explicit request.",
+      "Pushing directly to the main branch of an app repo needs the owner's explicit request; main moves only through a dev to main pull request.",
+      "Booting, erasing or deleting simulators that belong to another app, or cancelling another app's CI run, needs an explicit request."
+    ],
+    "hard_deny": [
+      "$defaults",
+      "Never read, modify or delete anything under a path listed in guardrails.protected_paths."
+    ]
+  }
+}

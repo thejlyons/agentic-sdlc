@@ -1,0 +1,13 @@
+The skills, agent definitions and hooks in this repository are written for Claude Code
+(skills in ~/.claude/skills, agents in ~/.claude/agents, hooks in ~/.claude/settings.json).
+They name models and CLI flags as they were on the "Live version as of" date in each file
+and may need changes for other tools or later versions.
+
+App-specific details were removed. The apps this process builds are unreleased; their names,
+card ids, repository names and paths were replaced with example values (FieldApp, StudyApp,
+FLD-123, STU-123, OWNER, roadmap-vault), and some product details were dropped. PR numbers and
+dates are real. The seed cards under dashboard/seed and dashboard/example-vault are invented.
+
+The lead-loop skill refers to other skills (vault-sdlc, apple-ci-standards, a
+working-with-the-owner skill, app-ux-standards, app-design-taste, xcode-device-hub-ci). Those are
+the owner's own and are not included here.
