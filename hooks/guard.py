@@ -7,7 +7,8 @@ the normal permission flow (and auto mode's classifier) decides.
 
 deny : anything touching a protected folder (guardrails.protected_paths in ~/.claude/lead/config.json;
        example ~/Protected); force-push to main or dev.
-ask  : a push to an app repo's main (the vault's main is exempt: card commits);
+ask  : a push to an app repo's main (exempt: the vault's main, for card commits,
+       and the public process repo's main, which has no dev branch; J, 2026-11-16);
        `gh pr merge` unless CI is all green AND the PR carries a "Review: PASS"
        comment from a separate reviewer; App Store Connect tooling; deleting
        vault content; deleting repos/releases; publishing a site by hand.
@@ -33,6 +34,7 @@ def _guardrails():
 _G = _guardrails()
 VAULT = _G.get("vault_repo") or "roadmap-vault"
 PROTECTED = [os.path.basename(p.rstrip("/")) for p in (_G.get("protected_paths") or ["~/Protected"])] or ["Protected"]
+PROCESS_REPO = "agentic-sdlc"  # public process repo: main only, synced by scripts/sync.py (its scan gates the push)
 REVIEW_MARK = "Review: PASS"
 SEPARATORS = {"&&", "||", ";", "|", "&"}
 
@@ -83,6 +85,13 @@ def is_vault(d):
     return VAULT in repo_url(d) or VAULT in os.path.abspath(d)
 
 
+def is_process_repo(d):
+    url = repo_url(d).rstrip("/")
+    if url.endswith(".git"):
+        url = url[:-4]
+    return url.endswith("/" + PROCESS_REPO) or os.path.basename(os.path.abspath(d)) == PROCESS_REPO
+
+
 def git_parts(seg, cwd):
     """For a `git ...` segment return (dir, subcommand, args) honouring -C and -c."""
     d, i = cwd, 1
@@ -118,7 +127,7 @@ def check_push(d, args):
         dsts += ["main", "dev"]
     if force and any(x in ("main", "dev") for x in dsts):
         return "deny", "Force-push to main or dev is never allowed."
-    if "main" in dsts and not is_vault(d):
+    if "main" in dsts and not is_vault(d) and not is_process_repo(d):
         return "ask", "Direct push to an app repo's main: J must approve (releases go through a dev to main PR)."
     return None
 
@@ -219,6 +228,10 @@ def selftest():
         ("git -C %s push origin dev:main" % app, "/tmp", "ask"),
         ("cd %s && git push origin HEAD:main" % app, "/tmp", "ask"),
         ("git push origin HEAD:main", vault, None),
+        ("git push origin HEAD:main", home + "/Github/" + PROCESS_REPO, None),
+        ("cd %s && git push -q origin HEAD:main" % (home + "/Github/" + PROCESS_REPO), "/tmp", None),
+        ("git push --force origin main", home + "/Github/" + PROCESS_REPO, "deny"),
+        ("git push origin HEAD:main", home + "/Github/agentic-sdlc-draft", "ask"),
         ("git push --force origin main", vault, "deny"),
         ("git push -f origin dev", app, "deny"),
         ("git push origin +abc:dev", app, "deny"),

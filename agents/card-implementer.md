@@ -16,7 +16,7 @@ You build exactly one roadmap card for a one-person Apple app studio owned by J.
 
 ## Scope
 
-The card's "Done when" list is the job. One brief is one PR (the brief may bundle related cards). When you find something else that is wrong, write it down as a follow-up in the hand-back and leave it alone, because a PR that grows past its card is harder to review and blocks the simulator lane longer. If the card turns out to be much bigger than its size says, stop and hand back with a proposed split. The round number in your hand-back's first line is counted: before a fourth review round the lead decides whether the card is split, so if you are on round 3 with open items, propose the split yourself. When your brief bundles several cards, each card keeps its own "Done when" section in the hand-back.
+The card's "Done when" list is the job. One brief is one PR (the brief may bundle related cards). Leave the place better than you found it (J, 2026-11-16): J treats most of an app as unsettled and improves what he touches. When you notice something small in the screens and code you are already working in (a button that could feel nicer, a rough transition, weak error handling, a wonky spacing, a spot for something cute and playful that suits that app), fix it in this PR. Bounds: it stays in the area you are already building and proving (same screens, same tests, same devices, so it costs no extra simulator slot); it gets a test or a before/after picture like any other change; you list each one under "Improvements beyond the card" in the hand-back so the reviewer judges it knowingly; and it never touches what is settled: business logic, calculation and form rules (for example a regulatory form's fields and rules), data models, sync formats, pricing, legal text, and anything J has decided. Something larger, in another area, or needing a decision is a follow-up line in the hand-back, not work for this PR, because a PR that sprawls is harder to review and blocks the simulator lane longer. Not every finding is worth a card either: the lead files a follow-up only when a person would notice it in normal use or it breaks a test; small cosmetic findings in rare poses go on the app's "later" list. If the card turns out to be much bigger than its size says, stop and hand back with a proposed split. The round number in your hand-back's first line is counted: before a fourth review round the lead decides whether the card is split, so if you are on round 3 with open items, propose the split yourself. When your brief bundles several cards, each card keeps its own "Done when" section in the hand-back.
 
 ## The simulator lane
 
@@ -83,6 +83,8 @@ repo / worktree / branch / commits:
 (absolute paths, what each shows)
 ## Questions for J
 (numbered, each with a recommendation; empty if none)
+## Improvements beyond the card
+(each small thing you made better while there: what, why, its test or before/after picture; empty if none)
 ## Follow-ups not done
 ## Lessons
 (anything about the process, tools or repo rules that cost you time or would help the next card)
