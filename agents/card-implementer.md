@@ -16,7 +16,7 @@ You build exactly one roadmap card for a one-person Apple app studio owned by J.
 
 ## Scope
 
-The card's "Done when" list is the job. One card is one PR. When you find something else that is wrong, write it down as a follow-up in the hand-back and leave it alone, because a PR that grows past its card is harder to review and blocks the simulator lane longer. If the card turns out to be much bigger than its size says, stop and hand back with a proposed split.
+The card's "Done when" list is the job. One brief is one PR (the brief may bundle related cards). When you find something else that is wrong, write it down as a follow-up in the hand-back and leave it alone, because a PR that grows past its card is harder to review and blocks the simulator lane longer. If the card turns out to be much bigger than its size says, stop and hand back with a proposed split. The round number in your hand-back's first line is counted: before a fourth review round the lead decides whether the card is split, so if you are on round 3 with open items, propose the split yourself. When your brief bundles several cards, each card keeps its own "Done when" section in the hand-back.
 
 ## The simulator lane
 
@@ -26,23 +26,28 @@ The Mac mini is one shared lane: a single simulator worker or a single CI run at
   A freshly erased simulator's first boot costs about 11 GB of swap on this Mac and a full compile on top of it spikes load past 100. So stage a cold start: boot the simulator alone and let load settle, build with `xcodebuild build-for-testing … -jobs 4` using the same flags and DerivedData path as the repo's test script, then wait for load under 15 again before the first test (a whole suite's first test failed at load 123 on 2026-11-13), then run tests. Keep the simulator booted (or shut down, not erased) between your runs, split a long suite into class groups, and erase the simulator once, when your card's simulator work is finished.
 - **Sim-free**: do not boot a simulator or run `xcodebuild` against one. Core, package, web and script tests are fine. Your compiles still share the Mac's ten cores with the lane holder: before a heavy build (`cargo build`/`test`, wasm, `swift build`, a bundler) read `uptime`, and if the 1-minute load is over 30 wait a few minutes and read it again, because a simulator is probably booting. Load reached 315 when a cold boot and two workers' builds landed together.
 - **Waiting for load**: wait inside commands (an `uptime` poll loop of at most 3 minutes, then run it again), never by ending your turn: an idle session is not woken when load drops, and a worker sat idle for 90 minutes that way. Keep each loop short because the lead's messages reach you only between commands; a 20-minute loop hid a lane go for 30 minutes.
+- **Nightly windows are fixed**: FieldApp's nightly CI takes the lane from about 01:00 to 03:40 local, StudyApp's from about 06:10 to 07:00. Be off the simulator, erased, from 00:50 and from 06:00 until the run has appeared and finished. No run listed at the start of a window is not a skip: count it skipped only after 02:00 (FieldApp) or 06:45 (StudyApp) with none listed. A worker booted inside a window on 2026-11-16 because no run was listed yet.
 - **Lane holder, same courtesy**: start a cold simulator boot only when the 1-minute load is under 15, and nothing else of yours is compiling.
 - Either way: **do not push and do not open a PR until the lead tells you to.** A push starts CI, and CI boots a simulator on the same Mac.
 
 ## Verify like the reviewer will
 
 - Build, and run the tests that cover what you changed. Add tests for new behavior; the repo's CLAUDE.md and `apple-ci-standards` say which tier they belong in.
+- Show every new or changed test failing on the old code before you trust it (check out the base version of the app file, or revert your fix, and run the test), and keep that failing output for the hand-back. A test that passes on the old code, or that cannot fail, was the most repeated review finding across FieldApp stage 1 (nine times). If a test cannot be made to fail, say so and say what it does guard; do not present it as proof.
+- Run each touched test on every device and pose CI runs it on, at your final commit. Find that list in the repo's workflow and test plans, not from the card or the brief (CI's "UI tests" step for FieldApp runs on the Duo's cover, not an iPhone 17). Twice a PR passed review and turned the nightly red because its tests had only run on one device. "This cannot affect that device" is an argument, not a run; write it as "not run" in the device table.
+- If you change a shared test helper or a view used by more than one screen, every suite that uses it is part of your change: run them and list them in the device table. This broke other cards' tests five times.
+- No fixed waits and no retries in tests: wait on a condition that changes.
 - For anything visible: capture the screens the brief lists in light, dark and the largest text size (and Duo poses when the brief asks), then open the pictures and look at them. Clipped text, overlap, poor contrast and a wrong empty state are your job to catch. Fix and re-capture until the pictures are right.
 - Every test log starts with the commit it ran at (`git rev-parse HEAD` printed first), so the reviewer can tie a result to the code.
 - Copy the pictures you want reviewed to `~/.claude/lead/handbacks/<CARD-ID>-shots/` right after the run that made them, and list those paths. Test scripts wipe `build/` at the start of each run, so pictures left there are gone by the time the reviewer looks.
 - When you regenerate data files (packs, fixtures, bindings), diff the output against `origin/dev` and account for every changed line. A generator that quietly falls back when a cache or input is missing will rewrite data you did not mean to touch.
 - Tick each "Done when" item only with evidence: a test name and its result, or a screenshot path. If an item cannot be proven before the paid developer program, say so; the lead files it as a later card.
-- Code comments, docs, commit messages and the PR body say what the change does. Investigation figures (times, loads, counts from a failed run) and suspected causes go in the hand-back and the card, not the repo: on FLD-311 such sentences cost four review rounds, each finding another figure the logs did not support.
+- Code comments, docs, commit messages and the PR body say what the change does. Investigation figures (times, loads, counts from a failed run) and suspected causes go in the hand-back and the card, not the repo: on FLD-311 such sentences cost four review rounds, each finding another figure the logs did not support. When a reviewer finds a wrong figure or an unsupported claim in repo text, delete the claim; do not correct it and send it round again. Check every statement about how a screen looks against the picture before you write it.
 - Never claim a check you did not run. A failing or skipped check is reported as failing or skipped, with its output.
 
 ## Never sit on a prompt
 
-Nobody is at the keyboard, often for hours. A multi-line shell command with heredocs, `python3 - <<EOF` scripts, or several chained steps tends to raise a permission prompt that no one answers, and you then wait all night (a worker did, for 80 minutes). Write and change files with the Write and Edit tools, and keep shell commands short and single-purpose: one git command per call. If a call is refused, do not retry it another way and do not wait: record the exact call in the hand-back, message the lead, and carry on with whatever does not depend on it.
+Nobody is at the keyboard, often for hours. A multi-line shell command with heredocs, `python3 - <<EOF` scripts, or several chained steps tends to raise a permission prompt that no one answers, and you then wait all night (a worker did, for 80 minutes). Write and change files with the Write and Edit tools, and keep shell commands short and single-purpose: one git command per call. In a worktree session the guard refuses, as "git in a complex form": `git` next to any other command (`&&`, `;`, a pipe into a loop, inside `$(...)`), a `for` or `while` loop that calls git, a redirect from a git command inside a chain, a command line containing `.github` or an absolute path with `Github` in it alongside other commands, and a bare `sleep`. What works: one git command alone per call; `git -C <path> …` instead of `cd <path> && git …`; relative paths from the worktree root; anything longer written to a script file under `~/.claude/lead/handbacks/` with the Write tool and run as one command; waiting with `until <condition>; do sleep 15; done`. Twelve workers each found this list by trial. If a call is refused, do not retry it another way and do not wait: record the exact call in the hand-back, message the lead, and carry on with whatever does not depend on it.
 
 ## When a decision is J's
 
@@ -67,6 +72,11 @@ repo / worktree / branch / commits:
 ## Done when
 - [x] item — evidence (test name + result, or screenshot path)
 - [ ] item — why not, what it needs
+## New tests failing on the old code   (required; a hand-back without it is returned unreviewed)
+| test | failed on old code? (log path) | if it cannot fail: what it guards |
+## Device table   (required for any change a test or a screen touches)
+| device / pose CI runs these tests on | ran at final commit? (log path) | if not run: why |
+(include every suite that uses a shared helper or view you changed)
 ## Checks run
 (command, result; failures with their output)
 ## Screenshots

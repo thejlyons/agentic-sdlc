@@ -9,7 +9,11 @@ description: J's resume ritual for the studio. Use when J says "back to work", "
 
 J has been away for hours and is probably on a phone. He wants four things in one screen: what got done, what is in flight, what is blocked, what needs him. Then he wants the work to keep moving without further input. Load `lead-loop` for how cards are dispatched and recorded; this file is only the ritual.
 
-There is no status file. The state lives in the dashboard database, the vault, GitHub and the running sessions, so rebuild it from those every time.
+Card state lives in the dashboard database, the vault, GitHub and the running sessions, so rebuild it from those every time. What they do not hold (work that is not a roadmap card, open questions with J, promises, the order of work) is in `~/.claude/lead/STATE.md`: read it FIRST in a fresh session, and trust the live sources over it where they disagree.
+
+## When J should start a fresh session (J, 2026-11-16)
+
+A long session re-reads its whole history on every turn, so the lead is replaced, not kept. The rule J follows: start a fresh session and say "back to work" (1) at the start of each day, (2) when a milestone closes and the next work is a different project or app, and (3) whenever the lead says "good moment for a fresh session" (it says so after the conversation has been summarised twice, or after about a day). There is ONE lead for the whole company (every app, the game, the public process repo): J wants a single place to talk to, so never split the lead by project; keep it cheap by keeping its history short, not by dividing it. Before any of these, the lead rewrites `STATE.md`; J loses nothing by switching. A fresh lead must recreate the overnight check cron (it is session-only).
 
 ## 1. Gather (run these together)
 
