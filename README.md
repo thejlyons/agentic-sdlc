@@ -4,7 +4,7 @@ This is the process one developer uses to build several Apple apps with Claude C
 The files here are the working ones (skills, agent definitions, hooks, machine-safety scripts, dashboard tooling), copied from the live setup by [scripts/sync.py](scripts/sync.py) with app names and private details replaced.
 It is also meant as a restore kit: the repo plus an interview about the real apps should bring a new machine or a new Claude account back to this state. So far that has been tested in a temporary home folder only, not on a new account or a second machine.
 
-Last synced with the live system: 2026-11-17. The apps are unreleased, so they appear as FieldApp (a field-data collection app, cards `FLD-n`) and StudyApp (a study app, cards `STU-n`).
+Last synced with the live system: 2026-11-18. The apps are unreleased, so they appear as FieldApp (a field-data collection app, cards `FLD-n`) and StudyApp (a study app, cards `STU-n`).
 
 ## Restore from zero
 
