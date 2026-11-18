@@ -3,7 +3,7 @@ name: lead-loop
 description: How the lead session runs studio roadmap cards end to end - pick, spec, dispatch a background worker, review, merge, record status on the dashboard, ping J. Use when dispatching or collecting a card worker, changing any card's status, deciding what runs on the simulator lane, asking J something, or writing a retro entry.
 ---
 
-> Live version as of 2026-11-16, sanitised by scripts/sync.py. App names (FieldApp, StudyApp), card ids (FLD-123), `$TOKENS` and the machine's numbers are example values: at run time the real ones come from `~/.claude/lead/config.json` (config/SCHEMA.md) and win wherever they differ.
+> Live version as of 2026-11-17, sanitised by scripts/sync.py. App names (FieldApp, StudyApp), card ids (FLD-123), `$TOKENS` and the machine's numbers are example values: at run time the real ones come from `~/.claude/lead/config.json` (config/SCHEMA.md) and win wherever they differ.
 
 # Lead loop
 
@@ -54,7 +54,7 @@ App order on the simulator lane is `apps[].lane_priority` in the config (J, 2026
 The build machine (`machine` in the config; the live one is a 16 GB Mac mini) crashed twice under parallel simulators. One lane: a single simulator worker OR a single CI run (a PR push counts, it boots a CI simulator). So:
 
 - At most one lane-holding worker. Sim-free workers may run beside it, at most two, and hold their pushes.
-- Before starting a lane worker, a push, or a full run: `~/.claude/lead/bin/macgate.sh` must exit 0 (load under 30, swap under 12 GB, nothing booted, no CI run active; the limits are `machine.gate`). To wait for it, run `~/.claude/lead/bin/waitgate.sh` in the background.
+- Before starting a lane worker, a push, or a full run: `~/.claude/lead/bin/macgate.sh` must exit 0 (load under 30, swap under 12 GB, nothing booted, no CI run active; the limits are `machine.gate`). To wait for it, run `~/.claude/lead/bin/waitgate.sh` in the background. Also read free disk (`df -g /System/Volumes/Data`): give the lane only with about 40 GB free (2026-11-17: a cold boot takes about 11 GB through swap and an iPad run fell from 36 to 22 GB, one above the stop line); get space first by having idle Rust worktrees `cargo clean`. Before spending a reviewer, check the hand-back's device table against the repo's CLAUDE.md row list, nightly device included (2026-11-17: an incomplete table cost a review round).
 - One PR in CI at a time. Release the lane to the next worker only after that CI run ends.
 - While a simulator job runs the stop rule is `~/.claude/lead/bin/macstop.sh` (J, 2026-11-11): a reading is bad when swap is over 13 GB and load is over 30 or free memory is under 15%, and the job stops only on two bad readings in a row about 2 minutes apart (J, 2026-11-12: a cold boot alone tripped the single-reading rule and cleared within a minute). Swap total alone misleads, because an erased simulator's first boot parks about 11 GB in swap. Readings in the first 5 minutes after a simulator boots are not counted (J, 2026-11-13: a cold boot alone tripped the two-readings rule); macstop reads the youngest launchd_sim's age itself. Simulators are erased at the end of a card, not between runs.
 - J's standing offer: any rule set under older conditions can be renegotiated. When a rule costs work, bring him the readings and a proposed replacement instead of working around it or silently obeying it forever.
