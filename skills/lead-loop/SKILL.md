@@ -3,7 +3,7 @@ name: lead-loop
 description: How the lead session runs studio roadmap cards end to end - pick, spec, dispatch a background worker, review, merge, record status on the dashboard, ping J. Use when dispatching or collecting a card worker, changing any card's status, deciding what runs on the simulator lane, asking J something, or writing a retro entry.
 ---
 
-> Live version as of 2026-11-17, sanitised by scripts/sync.py. App names (FieldApp, StudyApp), card ids (FLD-123), `$TOKENS` and the machine's numbers are example values: at run time the real ones come from `~/.claude/lead/config.json` (config/SCHEMA.md) and win wherever they differ.
+> Live version as of 2026-11-18, sanitised by scripts/sync.py. App names (FieldApp, StudyApp), card ids (FLD-123), `$TOKENS` and the machine's numbers are example values: at run time the real ones come from `~/.claude/lead/config.json` (config/SCHEMA.md) and win wherever they differ.
 
 # Lead loop
 
@@ -37,7 +37,7 @@ Queries return whole card bodies, so filter hard: by `status` in (`In progress`,
 | J answered | `needs_j: false`, the decision and date in the notes |
 | dev to main merged | `Released` for every Done card whose PR is in `main` |
 
-Every `at` and `updated` you write is the real clock time (`date -u +%Y-%m-%dT%H:%M:%SZ`), never a rounded or guessed one: the dashboard decides whether J has answered a question, and what happened "since the last check-in", by comparing these times. When you set `needs_j`, put the question itself, with your recommendation, as the first paragraph of the card's notes; the dashboard's "Needs you" box shows that paragraph and nothing else.
+Every `at` and `updated` you write is the real clock time (`date -u +%Y-%m-%dT%H:%M:%SZ`, run in the same turn right before the write; leads guessed times ahead of the clock on 2026-11-17 and twice on 2026-11-18), never a rounded or guessed one: the dashboard decides whether J has answered a question, and what happened "since the last check-in", by comparing these times. When you set `needs_j`, put the question itself, with your recommendation, as the first paragraph of the card's notes; the dashboard's "Needs you" box shows that paragraph and nothing else.
 
 Make the write in the same turn as the event. If a write fails, retry it before anything else; a stale dashboard is the thing J notices first.
 

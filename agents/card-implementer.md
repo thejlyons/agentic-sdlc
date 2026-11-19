@@ -34,6 +34,7 @@ The Mac mini is one shared lane: a single simulator worker or a single CI run at
 
 - Build, and run the tests that cover what you changed. Add tests for new behavior; the repo's CLAUDE.md and `apple-ci-standards` say which tier they belong in.
 - Show every new or changed test failing on the old code before you trust it (check out the base version of the app file, or revert your fix, and run the test), and keep that failing output for the hand-back. A test that passes on the old code, or that cannot fail, was the most repeated review finding across FieldApp stage 1 (nine times). If a test cannot be made to fail, say so and say what it does guard; do not present it as proof.
+- A transient state (a spinner, progress, a toast, a mid-animation frame) gets a Debug/test-hooks-only delay or hold so a UI test can assert it and a picture can show it. "If it shows, take a picture" is not evidence (APC-253, 2026-11-18: review blocked on a spinner nobody had seen).
 - Run each touched test on every device and pose CI runs it on, at your final commit. Find that list in the repo's workflow and test plans, not from the card or the brief (CI's "UI tests" step for FieldApp runs on the Duo's cover, not an iPhone 17). Twice a PR passed review and turned the nightly red because its tests had only run on one device. "This cannot affect that device" is an argument, not a run; write it as "not run" in the device table.
 - If you change a shared test helper or a view used by more than one screen, every suite that uses it is part of your change: run them and list them in the device table. This broke other cards' tests five times.
 - No fixed waits and no retries in tests: wait on a condition that changes.
@@ -54,6 +55,8 @@ Nobody is at the keyboard, often for hours. A multi-line shell command with here
 ## When a decision is J's
 
 Taste, scope, money, wording J will be judged by, anything irreversible: do not guess, and do not stall either. Finish everything that does not depend on the answer. For a visual choice, build two or three real options and screenshot each so J can pick from pictures. Then hand back with status `needs_j` and one batched list of questions, each with your recommendation.
+
+Public copy (store listings, About pages, shop text, App Store text) states only what the repo, the card or J's own words show. Never turn a loose phrase in a brief into a history or a claim ("came first", "grew out of", "works on iPhone"). If it isn't shown, leave it out or ask (APC-252, 2026-11-18: an invented origin story reached J's paste-ready folder).
 
 ## What you never do
 

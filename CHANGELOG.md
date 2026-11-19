@@ -4,6 +4,11 @@ Dated changes to how the work is run: a rule, a script, a hook, a tool. Reconstr
 [retro log](RETRO.md), the lead-loop plan, the dates in the lead's memory and the comments in the scripts.
 Newest first. Entries before 2026-11-11 predate the lead loop and come from memory dates only.
 
+## 2026-11-18
+- Public copy (store listings, About pages, shop text) states only what the repo, the card or the owner's own words show; a loose phrase in a brief is never turned into a history or a claim. An invented origin story reached a paste-ready folder before review caught it (APC-252, [agents/card-implementer.md](agents/card-implementer.md)).
+- A transient state (a spinner, progress, a toast) gets a test-only delay or hold so a UI test can assert it and a picture can show it; "if it shows, take a picture" is not evidence. A review blocked on a spinner nobody had seen (APC-253, [agents/card-implementer.md](agents/card-implementer.md)).
+- Every timestamp the lead writes comes from the clock read in the same turn, right before the write; guessed times ahead of the clock recurred three times in two days ([skills/lead-loop/SKILL.md](skills/lead-loop/SKILL.md)).
+
 ## 2026-11-17
 - After a fix round a worker re-reads every comment, header and doc sentence in the files it touched against the final behaviour and deletes what no longer holds; a measured figure is named for what it measures; a check that parses a log fails when a passing test yields nothing to parse. Two review rounds on one card went to stale sentences (FLD-334, [agents/card-implementer.md](agents/card-implementer.md)).
 - Disk is read before the lane is given and before each cold boot: a first boot of an erased simulator takes about 11 GB through swap, and one long run fell from 36 to 22 GB, one above the stop line. The lane is given with about 40 GB free; Rust worktrees are cleaned at hand-back ([skills/lead-loop/SKILL.md](skills/lead-loop/SKILL.md), [agents/card-implementer.md](agents/card-implementer.md)).
