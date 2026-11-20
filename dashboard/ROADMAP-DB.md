@@ -1,6 +1,6 @@
-> Live version as of 2026-11-16, sanitised by scripts/sync.py; app names and ids are the example config's.
+> Live version as of 2026-11-20, sanitised by scripts/sync.py; app names and ids are the example config's.
 
-# Roadmap cards in the artifact database (FieldApp, StudyApp, AppC)
+# Roadmap cards in the artifact database (FieldApp, StudyApp, AppC, AppD)
 
 The cards of these apps live in the database of the artifact **studio roadmap**:
 $DASHBOARD_URL (slug `$SLUG`).
@@ -15,10 +15,11 @@ The source before any of it is `~/.claude/lead/dashboard-backup/`. Tests:
 | FieldApp | `fld/FLD-<n>` | 2026-11-05 | `Roadmaps/FieldApp/` at `97a0f33` |
 | StudyApp | `stu/STU-<n>` | 2026-11-06 | `Roadmaps/StudyApp/` at `d953b33` |
 | AppC | `apc/APC-<n>` | 2026-11-11 | `Roadmaps/AppC/` at `1146862` |
+| AppD | `apd/APD-<n>` | 2026-11-20 | `Roadmaps/AppD/` at `372b06a` |
 
-**Rule for the coordinator and every worker: FieldApp, StudyApp and AppC card status, PR, notes
-and new cards are written to the database, never to the vault.** Each frozen folder has a `_FROZEN.md`,
-and the vault's CLAUDE.md says the same. The other apps (AppF, AppG, AppD,
+**Rule for the coordinator and every worker: FieldApp, StudyApp, AppC and AppD card
+status, PR, notes and new cards are written to the database, never to the vault.** Each frozen folder
+has a `_FROZEN.md`, and the vault's CLAUDE.md says the same. The other apps (AppF, AppG,
 AppE) stay in the vault; the page shows them read-only from `mirror.js` (see `sync_vault.py`).
 
 The database can only be written through the claude-artifacts MCP tools (`db_get`, `db_list`,
@@ -30,8 +31,8 @@ only builds payloads; a Claude thread sends them. (`fld_card.py` still works: it
 
 | Path | What |
 |---|---|
-| `fld/<id>`, `stu/<id>`, `apc/<id>` | One document per card (new cards: next free number of that prefix) |
-| `meta/fld_import`, `meta/stu_import`, `meta/apc_import` | Written by the page when its import from the vault finished: `{done, at, written, total, vault_commit, …}` |
+| `fld/<id>`, `stu/<id>`, `apc/<id>`, `apd/<id>` | One document per card (new cards: next free number of that prefix) |
+| `meta/fld_import`, `meta/stu_import`, `meta/apc_import`, `meta/apd_import` | Written by the page when its import from the vault finished: `{done, at, written, total, vault_commit, …}` |
 | `meta/lead_checkin` | `{at, by}`, written by the lead each time it reports to J |
 
 The page itself (`site/`): `logic.js` `DB_APPS` lists the DB apps and their collections; `app.js`
@@ -167,6 +168,13 @@ Read-only questions (what's in review, what needs J):
   - a worker that finds an AppC card missing (`exists: false`) writes it first from
     `out/apc_import/batch_NN.json` (that one card's `set` op as it is), then makes its change on top.
   Next new id: `APC-236`.
+- AppD (2026-11-20, vault `372b06a`, 323 cards, APD-1..APD-323): all imported by the page
+  from `apd_seed.js` (`roadmap_card.py seed --app "AppD"`) the next time the owner opens
+  it; it then writes `meta/apd_import`. Until then the page fills from the seed exactly as for AppC (tile numbers equal the old mirror's, guarded by tests, which keep the old rows in
+  `tests/apd_mirror_before.json`). Cards in flight at the move (APD-321 In progress, APD-323 Backlog with
+  needs_j) are in the seed as the vault had them; a status changed in the vault after `372b06a` must
+  be re-applied in the database. A worker that finds a card missing before the import is done writes
+  it from `roadmap_card.py import --app "AppD"`. Next new id: `APD-324`.
 - Moving another app later: add it to `DB_APPS` in `sync_vault.py` and `site/logic.js`, run
   `roadmap_card.py seed --app <App>`, publish the seed and the page, re-run `sync_vault.py` and
   publish `mirror.js`, freeze its vault folder with a `_FROZEN.md`, and update this file.
@@ -188,5 +196,5 @@ is past the license.
 - A document is capped at 256 KB (the largest card is ~15 KB) and a `db_write` call at about 64 KB.
 - Wikilinks (`[[STU-12]]`) show as text on the page, not links.
 - Two writers, one card: writes are last-writer-wins, guarded only by `ifVersion` on the tool side.
-- Obsidian's Dashboard still counts the frozen folders, so its FieldApp and StudyApp numbers are the
-  snapshot's, not live.
+- Obsidian's Dashboard still counts the frozen folders, so its FieldApp, StudyApp, AppC and
+  AppD numbers are the snapshot's, not live.

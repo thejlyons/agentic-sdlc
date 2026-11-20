@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-# Live version as of 2026-11-16, sanitised by scripts/sync.py; app, repo and machine values come from ~/.claude/lead/config.json.
+# Live version as of 2026-11-20, sanitised by scripts/sync.py; app, repo and machine values come from ~/.claude/lead/config.json.
 """Build db_write payloads for the roadmap cards kept in the studio roadmap artifact's database.
 
 Apps whose cards live in the database (see ROADMAP-DB.md), one collection each:
   FieldApp -> fld/FLD-<n>   (since 2026-11-05, vault snapshot 97a0f33)
   StudyApp     -> stu/STU-<n>   (since 2026-11-06)
   AppC  -> apc/APC-<n>     (since 2026-11-11, vault snapshot 1146862)
+  AppD -> apd/APD-<n>  (since 2026-11-20, vault snapshot 372b06a)
 Adding an app: put it in sync_vault.DB_APPS and logic.js DB_APPS, then `import --app <App>`.
 
 The database can only be written through the claude-artifacts MCP tools (db_write) or from the

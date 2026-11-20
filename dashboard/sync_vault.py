@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-# Live version as of 2026-11-16, sanitised by scripts/sync.py; app, repo and machine values come from ~/.claude/lead/config.json.
+# Live version as of 2026-11-20, sanitised by scripts/sync.py; app, repo and machine values come from ~/.claude/lead/config.json.
 """Mirror the vault's roadmap cards into the studio roadmap artifact.
 
 The vault (Roadmaps/<App>/<ID> <title>.md) stays the source of truth for every app except the
-DB_APPS below (FieldApp since 2026-11-05, StudyApp since 2026-11-06, AppC since 2026-11-11),
+DB_APPS below (FieldApp since 2026-11-05, StudyApp since 2026-11-06, AppC since 2026-11-11, AppD since 2026-11-20),
 whose cards live in the
 artifact's database (see ROADMAP-DB.md and roadmap_card.py). This script only reads the vault
 (files and `git log`); it never writes to it.
@@ -65,6 +65,7 @@ DB_APPS = {
     "FieldApp": {"collection": "fld", "prefix": "FLD"},
     "StudyApp": {"collection": "stu", "prefix": "STU"},
     "AppC": {"collection": "apc", "prefix": "APC"},
+    "AppD": {"collection": "apd", "prefix": "APD"},
 }
 PILOT_APPS = set(DB_APPS)
 

@@ -1,4 +1,4 @@
-// Live version as of 2026-11-16, sanitised by scripts/sync.py; app, repo and machine values come from ~/.claude/lead/config.json.
+// Live version as of 2026-11-20, sanitised by scripts/sync.py; app, repo and machine values come from ~/.claude/lead/config.json.
 // node --test ~/.claude/lead/dashboard/tests/
 const test = require("node:test");
 const assert = require("node:assert/strict");
@@ -56,6 +56,47 @@ test("a half-finished import shows the same numbers: database cards plus the see
   }
 });
 
+// The AppD tile as the live page showed it from the vault mirror before the move (2026-11-20, vault 372b06a).
+const APD_BEFORE = {
+  app: "AppD", phase: "2 Paid + beta", built: 4, total: 15, phasePre: false, headLabel: "Before the license",
+  headBuilt: 296, headTotal: 296, headPct: 100, pct: 27, license: 15, review: 0, progress: 2, release: 68, needsYou: 2,
+};
+const APD_ROWS_BEFORE = path.join(__dirname, "apd_mirror_before.json"); // the app's 323 mirror rows, as they were
+
+test("AppD is a database app with collection apd", () => {
+  assert.deepEqual(L.DB_APPS["AppD"], { collection: "apd", prefix: "APD" });
+  assert.equal(L.appOfId("APD-321"), "AppD");
+  assert.equal(L.appOfId("APC-45"), "AppC");
+});
+
+test("AppD tile numbers are the same from the seed as from the old mirror", { skip: !fs.existsSync(path.join(OUT, "apd_seed.js")) }, () => {
+  const seed = loadJs(path.join(OUT, "apd_seed.js"));
+  assert.equal(seed.cards.length, 323);
+  assert.equal(new Set(seed.cards.map((c) => c.id)).size, 323);
+  assert.deepEqual(L.summarize("AppD", seed.cards.map(L.rowFromDoc)), APD_BEFORE);
+  const oldApd = JSON.parse(fs.readFileSync(APD_ROWS_BEFORE, "utf8"));
+  assert.deepEqual(L.summarize("AppD", oldApd), APD_BEFORE);
+  const byId = new Map(oldApd.map((c) => [c.id, c]));
+  for (const card of seed.cards) {
+    const { live, ...row } = L.rowFromDoc(card);
+    const { status_at, ...was } = byId.get(card.id); // status_at is a mirror-only field; database cards use history
+    if (row.built_at || was.built_at) { row.built_at = new Date(row.built_at).toISOString(); was.built_at = new Date(was.built_at).toISOString(); }
+    assert.deepEqual(row, was, card.id);
+  }
+  const now = loadJs(path.join(OUT, "mirror.js"));
+  assert.equal(now.cards.filter((c) => c.app === "AppD").length, 0, "the mirror no longer carries AppD");
+});
+
+test("AppD: a half-finished import shows the same numbers", { skip: !fs.existsSync(path.join(OUT, "apd_seed.js")) }, () => {
+  const seed = loadJs(path.join(OUT, "apd_seed.js"));
+  for (const n of [0, 27, 150, 323]) {
+    const inDb = seed.cards.filter((c) => !L.built(c)).concat(seed.cards.filter(L.built)).slice(0, n);
+    const rows = L.fillFromSeed(inDb, seed.cards).map(L.rowFromDoc);
+    assert.equal(rows.length, 323);
+    assert.deepEqual(L.summarize("AppD", rows), APD_BEFORE, `with ${n} cards in the database`);
+  }
+});
+
 test("fillFromSeed keeps the database's version of a card", () => {
   const db = [{ id: "APC-1", status: "Done" }];
   const seed = [{ id: "APC-1", status: "Backlog" }, { id: "APC-2", status: "Backlog" }];
@@ -72,7 +113,7 @@ test("every app's tile numbers are what the 2026-11-11 logic.js computes from th
   const OLD = ctx.OLD || ctx.globalThis.RoadmapLogic;
   assert.ok(OLD && OLD.summarize, "old logic loaded");
   const cards = loadJs(path.join(OUT, "mirror.js")).cards;
-  for (const col of ["fld", "stu", "apc"]) cards.push(...loadJs(path.join(OUT, `${col}_seed.js`)).cards.map(L.rowFromDoc));
+  for (const col of ["fld", "stu", "apc", "apd"]) cards.push(...loadJs(path.join(OUT, `${col}_seed.js`)).cards.map(L.rowFromDoc));
   for (const app of L.APPS) {
     const cs = cards.filter((c) => c.app === app);
     assert.ok(cs.length, app);
@@ -256,7 +297,7 @@ test("preLicenseLeft counts unbuilt stage 0 and 1 cards and puts the moving ones
 });
 
 test("preLicenseLeft agrees with the tile for an app whose phase is before the license", { skip: !fs.existsSync(path.join(OUT, "apc_seed.js")) }, () => {
-  for (const col of ["fld", "stu", "apc"]) {
+  for (const col of ["fld", "stu", "apc", "apd"]) {
     const rows = loadJs(path.join(OUT, `${col}_seed.js`)).cards.map(L.rowFromDoc);
     const s = L.summarize(rows[0].app, rows), r = L.preLicenseLeft(rows);
     if (s.phasePre) assert.equal(r.left.length, s.headTotal - s.headBuilt, rows[0].app);

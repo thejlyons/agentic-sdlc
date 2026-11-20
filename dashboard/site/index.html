@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Live version as of 2026-11-16, sanitised by scripts/sync.py; app, repo and machine values come from ~/.claude/lead/config.json. -->
+<!-- Live version as of 2026-11-20, sanitised by scripts/sync.py; app, repo and machine values come from ~/.claude/lead/config.json. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -48,6 +48,10 @@
   .num { font-variant-numeric: tabular-nums; }
   a { color: var(--accent); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pins { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+  .pins a { display: inline-flex; align-items: center; min-height: 36px; padding: 6px 12px; border-radius: 999px; background: var(--panel);
+            border: 1px solid var(--line); color: var(--ink); font-size: 13.5px; font-weight: 600; text-decoration: none; }
+  .pins a:hover { border-color: var(--accent); color: var(--accent); }
   .banner { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line);
             font-size: 13.5px; color: var(--ink-2); }
   .banner[hidden] { display: none; }
@@ -206,6 +210,7 @@
 <div class="wrap">
   <h1>Roadmap</h1>
   <p class="sub" id="takeaway">Loading the cards…</p>
+  <nav class="pins" id="pins" aria-label="Pinned pages" hidden></nav>
   <div class="banner" id="gaps" role="status" hidden></div>
   <div class="banner" id="banner" hidden></div>
 

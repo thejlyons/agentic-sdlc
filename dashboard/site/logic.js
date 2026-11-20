@@ -1,4 +1,4 @@
-// Live version as of 2026-11-16, sanitised by scripts/sync.py; app, repo and machine values come from ~/.claude/lead/config.json.
+// Live version as of 2026-11-20, sanitised by scripts/sync.py; app, repo and machine values come from ~/.claude/lead/config.json.
 // Pure roadmap logic shared by the page and the node tests (no DOM, no db).
 // The counting rules copy the vault's _scripts/summary/view.js and _scripts/waiting-on-j/view.js.
 (function (root) {
@@ -9,6 +9,7 @@
     FieldApp: { collection: "fld", prefix: "FLD" },
     StudyApp: { collection: "stu", prefix: "STU" },
     "AppC": { collection: "apc", prefix: "APC" },
+    "AppD": { collection: "apd", prefix: "APD" },
   };
   const LIVE_APPS = new Set(Object.keys(DB_APPS));
   const appOfId = (id) => Object.keys(DB_APPS).find((a) => String(id).startsWith(DB_APPS[a].prefix + "-")) || null;

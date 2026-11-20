@@ -10,6 +10,7 @@ includes its source; it has no screenshots, because the real page shows private 
   [dashboard/tests/logic.test.js](../dashboard/tests/logic.test.js)
 - Card tool: [dashboard/roadmap_card.py](../dashboard/roadmap_card.py)
 - Rebuilding it from this repo: [dashboard/RESTORE.md](../dashboard/RESTORE.md)
+- Its smaller sibling for steps only the owner can do: [owner-checklist.md](owner-checklist.md)
 
 ## Data model in brief
 

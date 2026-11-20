@@ -4,6 +4,14 @@ Dated changes to how the work is run: a rule, a script, a hook, a tool. Reconstr
 [retro log](RETRO.md), the lead-loop plan, the dates in the lead's memory and the comments in the scripts.
 Newest first. Entries before 2026-11-11 predate the lead loop and come from memory dates only.
 
+## 2026-11-20
+- The owner's launch checklist is part of the process: one small page per app for the steps only the owner can do, in order, each naming what it waits for on either side, with paste-ready values and a note field the lead reads ([docs/owner-checklist.md](docs/owner-checklist.md)). The owner: "super useful".
+- A fourth app's cards moved from the vault to the dashboard's database, by the page's own import on the owner's next visit; a test pins its tile numbers to what the mirror showed before ([dashboard/ROADMAP-DB.md](dashboard/ROADMAP-DB.md)).
+- The dashboard shows a row of pinned pages under its title, read from a `meta/links` document the lead writes, so the checklists are one tap away ([dashboard/site/app.js](dashboard/site/app.js)).
+- The memory gate lets a job start with swap up to 13 GB when the machine is otherwise idle (load under 5): stale swap just over the 12 GB line was costing 3 to 10 minutes after most jobs ([scripts/macgate.sh](scripts/macgate.sh)).
+- Nightly runs are paused during a heavy build phase: they were green every night and took the whole night's simulator lane.
+- The lead never puts store-tooling words in a shell command, even inside a search pattern: the guard hook matches the words and asks the owner ([hooks/guard.py](hooks/guard.py)).
+
 ## 2026-11-18
 - Public copy (store listings, About pages, shop text) states only what the repo, the card or the owner's own words show; a loose phrase in a brief is never turned into a history or a claim. An invented origin story reached a paste-ready folder before review caught it (APC-252, [agents/card-implementer.md](agents/card-implementer.md)).
 - A transient state (a spinner, progress, a toast) gets a test-only delay or hold so a UI test can assert it and a picture can show it; "if it shows, take a picture" is not evidence. A review blocked on a spinner nobody had seen (APC-253, [agents/card-implementer.md](agents/card-implementer.md)).

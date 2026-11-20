@@ -1,6 +1,6 @@
-// Live version as of 2026-11-16, sanitised by scripts/sync.py; app, repo and machine values come from ~/.claude/lead/config.json.
-// studio roadmap page. The apps in L.DB_APPS (FieldApp, StudyApp, AppC) come live from
-// this artifact's database, one collection each (fld, stu, apc), where J can change a card; the others come
+// Live version as of 2026-11-20, sanitised by scripts/sync.py; app, repo and machine values come from ~/.claude/lead/config.json.
+// studio roadmap page. The apps in L.DB_APPS (FieldApp, StudyApp, AppC, AppD) come live from
+// this artifact's database, one collection each (fld, stu, apc, apd), where J can change a card; the others come
 // from mirror.js, a read-only snapshot of the vault rebuilt by sync_vault.py. Every DB app is
 // handled the same way, so moving another app is a line in logic.js plus its import.
 // Counting rules are in logic.js.
@@ -107,6 +107,7 @@
     const needs = L.sortNeeds(cards, phases);
     const flight = flightItems(now);
     renderHeader(needs, flight, now);
+    renderPins();
     renderNeeds(needs);
     renderDecided();
     renderSince(now);
@@ -120,6 +121,18 @@
 
   const realDocs = () => DB_APPS.flatMap((a) => [...live[a].values()].filter((d) => d && d.id));
   const mirrorRows = () => MIRROR.cards.filter((c) => !isLive(c.app));
+  // Pinned pages: meta/links {items: [{title, url}]}, written by the lead (the checklists and other pages J asked to keep at hand).
+  let pinsSig = null;
+  function renderPins() {
+    const doc = meta.get("links");
+    const items = ((doc && doc.items) || []).filter((x) => x && x.title && /^https:\/\//.test(x.url || ""));
+    const sig = JSON.stringify(items);
+    if (sig === pinsSig) return;
+    pinsSig = sig;
+    const box = $("#pins");
+    box.hidden = !items.length;
+    box.replaceChildren(...items.map((x) => h("a", { href: x.url, target: "_blank", rel: "noopener" }, x.title)));
+  }
   const checkinAt = () => { const c = meta.get("lead_checkin"); return c && L.ms(c.at) ? c.at : ""; };
   const agoText = (iso, now) => { const a = L.ago(iso, now); return a === "just now" || !a ? a : a + " ago"; };
   const anyLoading = () => DB_APPS.some((a) => liveState[a] === "loading" || liveState[a] === "slow" || (db && !appReady(a)));
